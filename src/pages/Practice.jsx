@@ -3,6 +3,7 @@ import Card from '../components/Card.jsx'
 import { SUBJECTS, VERBS } from '../data/verbs_es.js'
 import { sample, normalise } from '../lib/utils.js'
 import { supabase } from '../lib/supabase.js'
+console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
 
 function useLocalSetting(key, initial){
   const [state, setState] = React.useState(() => {
