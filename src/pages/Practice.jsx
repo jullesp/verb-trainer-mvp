@@ -2,6 +2,7 @@ import React from 'react'
 import Card from '../components/Card.jsx'
 import { SUBJECTS, VERBS } from '../data/verbs_es.js'
 import { sample, normalise } from '../lib/utils.js'
+import { supabase } from '../lib/supabase.js'
 
 function useLocalSetting(key, initial){
   const [state, setState] = React.useState(() => {
@@ -12,8 +13,17 @@ function useLocalSetting(key, initial){
   return [state, setState]
 }
 
+function getSessionId(){
+  let id = localStorage.getItem('session_id')
+  if(!id){
+    id = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36)
+    localStorage.setItem('session_id', id)
+  }
+  return id
+}
+
 export default function Practice(){
-  const [filter, setFilter] = useLocalSetting('filter', 'both') // 'regular' | 'irregular' | 'both'
+  const [filter, setFilter] = useLocalSetting('filter', 'both')
   const pool = VERBS.filter(v => filter==='both' ? true : filter==='regular' ? v.regular : !v.regular)
 
   const [question, setQuestion] = React.useState(() => {
@@ -34,7 +44,7 @@ export default function Practice(){
     setFeedback(null)
   }, [pool])
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     const answer = question.verb.forms[question.subjectIndex]
     const ok = normalise(guess) === normalise(answer)
@@ -42,6 +52,26 @@ export default function Practice(){
     setCount(c => c+1)
     setCorrect(c => c + (ok?1:0))
     setTimeout(ask, 800)
+
+    // --- Supabase logging (attempt + points) ---
+    const sid = getSessionId()
+
+    // 1) Log attempt (ignore errors silently for MVP)
+    try {
+      await supabase.from('attempts').insert({
+        session_id: sid,
+        infinitive: question.verb.infinitive,
+        subject_index: question.subjectIndex,
+        correct: ok
+      })
+    } catch {}
+
+    // 2) If correct, increment points via RPC
+    if (ok) {
+      try {
+        await supabase.rpc('increment_points', { sid_param: sid })
+      } catch {}
+    }
   }
 
   const accuracy = count ? Math.round((correct/count)*100) : 0
