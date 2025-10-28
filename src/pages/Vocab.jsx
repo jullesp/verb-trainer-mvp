@@ -1,8 +1,9 @@
 import { useMemo, useState, useEffect } from 'react'
-import { THEMES, UNITS, VOCAB, unitsForTheme } from '../data/vocab_es_foundation'
+import { THEMES, VOCAB } from '../data/vocab_es_foundation'
+import { UNITS, unitsForTheme, categorise } from '../data/vocab_catalogue'
 
 // -----------------------------
-// Normalisation utilities
+// Normalisation utilities (unchanged)
 // -----------------------------
 const stripDiacritics = (s) =>
   (s || '')
@@ -17,55 +18,45 @@ const removePunctuation = (s) =>
 
 const SPAN_ARTICLES = /^(el|la|los|las|un|una|unos|unas)\s+/i
 
-// Normalise Spanish (ignore articles, diacritics, punctuation, case)
 function normEs(s) {
   let out = stripDiacritics(s)
   out = removePunctuation(out.toLowerCase())
-  out = out.replace(SPAN_ARTICLES, '') // drop leading article
+  out = out.replace(SPAN_ARTICLES, '')
   out = collapseSpaces(out)
   return out
 }
-
-// Normalise English (ignore "to " for verbs, diacritics, punctuation, case)
 function normEn(s) {
   let out = stripDiacritics(s)
   out = removePunctuation(out.toLowerCase())
-  out = out.replace(/^to\s+/, '') // allow "to dance" == "dance"
+  out = out.replace(/^to\s+/, '')
   out = collapseSpaces(out)
   return out
 }
-
-// Split a model answer string into alternatives:
-// supports:  "thin / slim", "thin, slim", "thin; slim", "thin or slim"
 function splitAlts(raw) {
   return (raw || '')
     .split(/\s*(?:\/|,|;|\bor\b)\s*/i)
     .filter(Boolean)
 }
-
-// Return true if user's answer matches any acceptable alternative
 function matchesFlexible({ user, correct, direction }) {
   const alts = splitAlts(correct)
   if (direction === 'es-en') {
     const u = normEn(user)
     return alts.some(a => normEn(a) === u)
-  } else { // en-es
+  } else {
     const u = normEs(user)
     return alts.some(a => normEs(a) === u)
   }
 }
 
-// -----------------------------
-// Component
-// -----------------------------
 export default function Vocab() {
   const [theme, setTheme] = useState('T1')
   const [selectedUnits, setSelectedUnits] = useState([])
-  const [direction, setDirection] = useState('es-en') // 'es-en' or 'en-es'
-  const [current, setCurrent] = useState(null)        // {q, a, source}
+  const [direction, setDirection] = useState('es-en')
+  const [current, setCurrent] = useState(null)
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState('')
   const [score, setScore] = useState({ correct: 0, attempts: 0 })
+  const [showUnassigned, setShowUnassigned] = useState(false)
 
   // When theme changes, preselect all its units
   useEffect(() => {
@@ -73,11 +64,23 @@ export default function Vocab() {
     setSelectedUnits(themeUnits)
   }, [theme])
 
-  // Pool of items for selected units
+  // Build categorised pool based on chosen theme + units
   const pool = useMemo(() => {
     const activeUnits = new Set(selectedUnits)
-    return VOCAB.filter(v => activeUnits.has(v.unit))
-  }, [selectedUnits])
+    const items = VOCAB
+      .filter(v => v.theme === theme)                // narrow to theme
+      .map(v => ({ ...v, unitAuto: categorise(v) })) // auto-assign unit
+      .filter(v => {
+        if (activeUnits.has(v.unitAuto)) return true
+        if (showUnassigned) {
+          // edge-case: if something didn’t match any rule and fell back to the first unit,
+          // allow it when showUnassigned is ON
+          return !activeUnits.size
+        }
+        return false
+      })
+    return items
+  }, [selectedUnits, theme, showUnassigned])
 
   function newCard() {
     if (pool.length === 0) {
@@ -102,13 +105,10 @@ export default function Vocab() {
     })
     setFeedback(ok ? '✅ Correct!' : `❌ Correct: ${current.a}`)
     setScore(s => ({ correct: s.correct + (ok ? 1 : 0), attempts: s.attempts + 1 }))
-
-    // quick auto-next
     setTimeout(() => newCard(), 500)
   }
 
-  // Enter key: if there is a current card & some text, check → next
-  // If no card yet, Enter starts the first card.
+  // Enter key: start/check
   useEffect(() => {
     const onKey = e => {
       if (e.key !== 'Enter') return
@@ -117,9 +117,7 @@ export default function Vocab() {
         newCard()
         return
       }
-      if (answer.trim()) {
-        check()
-      }
+      if (answer.trim()) check()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -130,7 +128,6 @@ export default function Vocab() {
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     )
   }
-
   function resetScore() {
     setScore({ correct: 0, attempts: 0 })
     setFeedback('')
@@ -141,7 +138,7 @@ export default function Vocab() {
   const themeUnits = unitsForTheme(theme)
 
   return (
-    <div className="p-6 max-w-4xl mx-auto text-gray-800">
+    <div className="p-6 max-w-5xl mx-auto text-gray-800">
       <h1 className="text-2xl font-bold mb-4">GCSE Vocab Trainer (Foundation)</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -184,6 +181,15 @@ export default function Vocab() {
                 Clear
               </button>
             </div>
+
+            <label className="mt-3 flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showUnassigned}
+                onChange={() => setShowUnassigned(v => !v)}
+              />
+              Show any unassigned items (rare)
+            </label>
           </div>
         </div>
 
@@ -214,10 +220,7 @@ export default function Vocab() {
           </div>
 
           <div className="mt-4 flex gap-3">
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={newCard}
-            >
+            <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={newCard}>
               New Card
             </button>
             <button
@@ -227,10 +230,7 @@ export default function Vocab() {
             >
               Check
             </button>
-            <button
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-              onClick={resetScore}
-            >
+            <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={resetScore}>
               Reset Score
             </button>
           </div>
@@ -243,7 +243,7 @@ export default function Vocab() {
           <>
             <div className="text-sm text-gray-600 mb-2">
               Theme: <strong>{THEMES.find(t => t.id === current.source.theme)?.label}</strong> · Unit:{' '}
-              <strong>{UNITS.find(u => u.id === current.source.unit)?.label}</strong>
+              <strong>{UNITS.find(u => u.id === current.source.unitAuto)?.label}</strong>
             </div>
             <div className="text-2xl font-bold mb-3">{current.q}</div>
             <input
