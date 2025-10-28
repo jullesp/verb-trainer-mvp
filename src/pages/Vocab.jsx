@@ -1,31 +1,82 @@
 import { useMemo, useState, useEffect } from 'react'
 import { THEMES, UNITS, VOCAB, unitsForTheme } from '../data/vocab_es_foundation'
 
-// Normalise strings for forgiving matching (ignores case/extra spaces)
-const norm = s => (s || '').trim().toLowerCase()
+// -----------------------------
+// Normalisation utilities
+// -----------------------------
+const stripDiacritics = (s) =>
+  (s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
 
+const collapseSpaces = (s) =>
+  (s || '').replace(/\s+/g, ' ').trim()
+
+const removePunctuation = (s) =>
+  (s || '').replace(/[.,;:!?()"'`]/g, '')
+
+const SPAN_ARTICLES = /^(el|la|los|las|un|una|unos|unas)\s+/i
+
+// Normalise Spanish (ignore articles, diacritics, punctuation, case)
+function normEs(s) {
+  let out = stripDiacritics(s)
+  out = removePunctuation(out.toLowerCase())
+  out = out.replace(SPAN_ARTICLES, '') // drop leading article
+  out = collapseSpaces(out)
+  return out
+}
+
+// Normalise English (ignore "to " for verbs, diacritics, punctuation, case)
+function normEn(s) {
+  let out = stripDiacritics(s)
+  out = removePunctuation(out.toLowerCase())
+  out = out.replace(/^to\s+/, '') // allow "to dance" == "dance"
+  out = collapseSpaces(out)
+  return out
+}
+
+// Split a model answer string into alternatives:
+// supports:  "thin / slim", "thin, slim", "thin; slim", "thin or slim"
+function splitAlts(raw) {
+  return (raw || '')
+    .split(/\s*(?:\/|,|;|\bor\b)\s*/i)
+    .filter(Boolean)
+}
+
+// Return true if user's answer matches any acceptable alternative
+function matchesFlexible({ user, correct, direction }) {
+  const alts = splitAlts(correct)
+  if (direction === 'es-en') {
+    const u = normEn(user)
+    return alts.some(a => normEn(a) === u)
+  } else { // en-es
+    const u = normEs(user)
+    return alts.some(a => normEs(a) === u)
+  }
+}
+
+// -----------------------------
+// Component
+// -----------------------------
 export default function Vocab() {
   const [theme, setTheme] = useState('T1')
   const [selectedUnits, setSelectedUnits] = useState([])
   const [direction, setDirection] = useState('es-en') // 'es-en' or 'en-es'
-  const [current, setCurrent] = useState(null) // {q, a, source}
+  const [current, setCurrent] = useState(null)        // {q, a, source}
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState('')
   const [score, setScore] = useState({ correct: 0, attempts: 0 })
 
-  // When theme changes, default to all its units
+  // When theme changes, preselect all its units
   useEffect(() => {
     const themeUnits = unitsForTheme(theme).map(u => u.id)
     setSelectedUnits(themeUnits)
   }, [theme])
 
-  // Filter pool based on theme + units
+  // Pool of items for selected units
   const pool = useMemo(() => {
     const activeUnits = new Set(selectedUnits)
-    return VOCAB.filter(v => {
-      // match theme via the unit; (robust if you add items with correct unit ids)
-      return activeUnits.has(v.unit)
-    })
+    return VOCAB.filter(v => activeUnits.has(v.unit))
   }, [selectedUnits])
 
   function newCard() {
@@ -44,23 +95,35 @@ export default function Vocab() {
 
   function check() {
     if (!current) return
-    const isCorrect = norm(answer) === norm(current.a)
-    setFeedback(isCorrect ? '✅ Correct!' : `❌ Correct: ${current.a}`)
-    setScore(s => ({ correct: s.correct + (isCorrect ? 1 : 0), attempts: s.attempts + 1 }))
-    setTimeout(() => newCard(), 900)
+    const ok = matchesFlexible({
+      user: answer,
+      correct: current.a,
+      direction
+    })
+    setFeedback(ok ? '✅ Correct!' : `❌ Correct: ${current.a}`)
+    setScore(s => ({ correct: s.correct + (ok ? 1 : 0), attempts: s.attempts + 1 }))
+
+    // quick auto-next
+    setTimeout(() => newCard(), 500)
   }
 
-  // Enter submits
+  // Enter key: if there is a current card & some text, check → next
+  // If no card yet, Enter starts the first card.
   useEffect(() => {
     const onKey = e => {
-      if (e.key === 'Enter' && answer.trim()) {
-        e.preventDefault()
+      if (e.key !== 'Enter') return
+      e.preventDefault()
+      if (!current) {
+        newCard()
+        return
+      }
+      if (answer.trim()) {
         check()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [answer, current, direction])
+  }, [answer, current, direction, pool])
 
   function toggleUnit(id) {
     setSelectedUnits(prev =>
