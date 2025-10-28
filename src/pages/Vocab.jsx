@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from 'react'
-import { THEMES, VOCAB } from '../data/vocab_es_foundation'
+import { THEMES, VOCAB as STATIC_VOCAB } from '../data/vocab_es_foundation'
 import { UNITS, unitsForTheme, categorise } from '../data/vocab_catalogue'
 
 // -----------------------------
-// Normalisation utilities (unchanged)
+// Normalisation utilities
 // -----------------------------
 const stripDiacritics = (s) =>
   (s || '')
@@ -48,6 +48,58 @@ function matchesFlexible({ user, correct, direction }) {
   }
 }
 
+// -----------------------------
+// Light CSV parser (no deps)
+// Accepts lines like:
+// theme,es,en
+// T1,hola,hello
+// T3,el aeropuerto,airport
+//
+// Optional 4th column "unit" is accepted, but not required.
+// -----------------------------
+function parseCSV(text) {
+  const rows = text
+    .split(/\r?\n/)
+    .map(r => r.trim())
+    .filter(Boolean)
+  if (rows.length === 0) return []
+
+  // very simple splitter; supports quoted fields with commas
+  const parseRow = (r) => {
+    const out = []
+    let cur = '', inQ = false
+    for (let i = 0; i < r.length; i++) {
+      const ch = r[i]
+      if (ch === '"' ) {
+        if (inQ && r[i+1] === '"') { cur += '"'; i++ } else { inQ = !inQ }
+      } else if (ch === ',' && !inQ) {
+        out.push(cur)
+        cur = ''
+      } else {
+        cur += ch
+      }
+    }
+    out.push(cur)
+    return out.map(s => s.trim())
+  }
+
+  // detect header
+  const header = parseRow(rows[0]).map(h => h.toLowerCase())
+  const dataRows = (/^(theme|tema)/i.test(header[0])) ? rows.slice(1) : rows
+
+  const items = []
+  for (const r of dataRows) {
+    const cols = parseRow(r)
+    if (!cols[0] || !cols[1] || !cols[2]) continue
+    const theme = cols[0].toUpperCase()
+    const es = cols[1]
+    const en = cols[2]
+    const unit = cols[3] || null
+    items.push({ theme, es, en, unit })
+  }
+  return items
+}
+
 export default function Vocab() {
   const [theme, setTheme] = useState('T1')
   const [selectedUnits, setSelectedUnits] = useState([])
@@ -58,6 +110,13 @@ export default function Vocab() {
   const [score, setScore] = useState({ correct: 0, attempts: 0 })
   const [showUnassigned, setShowUnassigned] = useState(false)
 
+  // Dynamic (imported) vocab appended to static
+  const [extraVocab, setExtraVocab] = useState([])
+
+  const ALL_VOCAB = useMemo(() => {
+    return [...STATIC_VOCAB, ...extraVocab]
+  }, [extraVocab])
+
   // When theme changes, preselect all its units
   useEffect(() => {
     const themeUnits = unitsForTheme(theme).map(u => u.id)
@@ -67,20 +126,16 @@ export default function Vocab() {
   // Build categorised pool based on chosen theme + units
   const pool = useMemo(() => {
     const activeUnits = new Set(selectedUnits)
-    const items = VOCAB
+    const items = ALL_VOCAB
       .filter(v => v.theme === theme)                // narrow to theme
-      .map(v => ({ ...v, unitAuto: categorise(v) })) // auto-assign unit
+      .map(v => ({ ...v, unitAuto: v.unit || categorise(v) })) // use given unit or auto
       .filter(v => {
         if (activeUnits.has(v.unitAuto)) return true
-        if (showUnassigned) {
-          // edge-case: if something didn’t match any rule and fell back to the first unit,
-          // allow it when showUnassigned is ON
-          return !activeUnits.size
-        }
+        if (showUnassigned) return !activeUnits.size
         return false
       })
     return items
-  }, [selectedUnits, theme, showUnassigned])
+  }, [selectedUnits, theme, showUnassigned, ALL_VOCAB])
 
   function newCard() {
     if (pool.length === 0) {
@@ -135,11 +190,65 @@ export default function Vocab() {
     newCard()
   }
 
+  // ----- CSV Import handlers -----
+  function handlePasteCSV() {
+    const raw = prompt(
+      'Paste CSV (columns: theme,es,en[,unit]). First line can be a header.'
+    )
+    if (!raw) return
+    const parsed = parseCSV(raw)
+    if (parsed.length === 0) {
+      alert('No rows detected.')
+      return
+    }
+    setExtraVocab(v => [...v, ...parsed])
+    alert(`Imported ${parsed.length} rows.`)
+  }
+
+  function handleFileCSV(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const parsed = parseCSV(String(reader.result))
+      if (parsed.length === 0) {
+        alert('No rows detected.')
+        return
+      }
+      setExtraVocab(v => [...v, ...parsed])
+      alert(`Imported ${parsed.length} rows.`)
+    }
+    reader.readAsText(file)
+  }
+
   const themeUnits = unitsForTheme(theme)
 
   return (
     <div className="p-6 max-w-5xl mx-auto text-gray-800">
-      <h1 className="text-2xl font-bold mb-4">GCSE Vocab Trainer (Foundation)</h1>
+      <h1 className="text-2xl font-bold mb-2">GCSE Vocab Trainer (Foundation)</h1>
+
+      {/* Import row */}
+      <div className="mb-4 flex flex-wrap gap-3 items-center">
+        <button
+          className="border px-3 py-2 rounded"
+          onClick={handlePasteCSV}
+          title="Paste CSV from clipboard"
+        >
+          Import CSV (paste)
+        </button>
+        <label className="border px-3 py-2 rounded cursor-pointer">
+          Import CSV (file)
+          <input
+            type="file"
+            accept=".csv,.txt"
+            onChange={handleFileCSV}
+            className="hidden"
+          />
+        </label>
+        <span className="text-sm text-gray-500">
+          Columns: <code>theme,es,en[,unit]</code> — theme must be T1/T2/T3
+        </span>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Theme + Units */}
@@ -243,7 +352,7 @@ export default function Vocab() {
           <>
             <div className="text-sm text-gray-600 mb-2">
               Theme: <strong>{THEMES.find(t => t.id === current.source.theme)?.label}</strong> · Unit:{' '}
-              <strong>{UNITS.find(u => u.id === current.source.unitAuto)?.label}</strong>
+              <strong>{UNITS.find(u => u.id === (current.source.unit || categorise(current.source)))?.label}</strong>
             </div>
             <div className="text-2xl font-bold mb-3">{current.q}</div>
             <input
