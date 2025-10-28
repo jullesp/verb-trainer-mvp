@@ -1,133 +1,200 @@
 // ===============================
 // Spanish Verb Trainer Data File
 // ===============================
-// Contains subject pronouns, tenses, and a full verb bank
-// for the Top 10 Core Verbs (AQA GCSE + Top 50 foundation)
+// Subjects, tenses, and Top 50 verb bank (AQA GCSE aligned)
+// ===============================
 
-// --------------------------------
-// Subject pronouns
-// --------------------------------
 export const SUBJECTS = ['yo','tú','él/ella/usted','nosotros','vosotros','ellos/ustedes']
-
-// --------------------------------
-// Supported tenses
-// --------------------------------
 export const TENSES = ['presente','pretérito','imperfecto','futuro']
 
-// --------------------------------
-// Verb bank
-// --------------------------------
 export const VERB_BANK = [
 
+  // ---------- TOP 10 CORE (Irregular) ----------
   {
-    infinitive: 'ser',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['soy','eres','es','somos','sois','son'],
-      'pretérito': ['fui','fuiste','fue','fuimos','fuisteis','fueron'],
-      'imperfecto': ['era','eras','era','éramos','erais','eran'],
-      'futuro': ['seré','serás','será','seremos','seréis','serán']
+    infinitive:'ser',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['soy','eres','es','somos','sois','son'],
+      'pretérito':['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+      'imperfecto':['era','eras','era','éramos','erais','eran'],
+      'futuro':['seré','serás','será','seremos','seréis','serán']
     }
   },
-  {
-    infinitive: 'estar',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['estoy','estás','está','estamos','estáis','están'],
-      'pretérito': ['estuve','estuviste','estuvo','estuvimos','estuvisteis','estuvieron'],
-      'imperfecto': ['estaba','estabas','estaba','estábamos','estabais','estaban'],
-      'futuro': ['estaré','estarás','estará','estaremos','estaréis','estarán']
-    }
-  },
-  {
-    infinitive: 'tener',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['tengo','tienes','tiene','tenemos','tenéis','tienen'],
-      'pretérito': ['tuve','tuviste','tuvo','tuvimos','tuvisteis','tuvieron'],
-      'imperfecto': ['tenía','tenías','tenía','teníamos','teníais','tenían'],
-      'futuro': ['tendré','tendrás','tendrá','tendremos','tendréis','tendrán']
-    }
-  },
-  {
-    infinitive: 'hacer',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['hago','haces','hace','hacemos','hacéis','hacen'],
-      'pretérito': ['hice','hiciste','hizo','hicimos','hicisteis','hicieron'],
-      'imperfecto': ['hacía','hacías','hacía','hacíamos','hacíais','hacían'],
-      'futuro': ['haré','harás','hará','haremos','haréis','harán']
-    }
-  },
-  {
-    infinitive: 'ir',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['voy','vas','va','vamos','vais','van'],
-      'pretérito': ['fui','fuiste','fue','fuimos','fuisteis','fueron'],
-      'imperfecto': ['iba','ibas','iba','íbamos','ibais','iban'],
-      'futuro': ['iré','irás','irá','iremos','iréis','irán']
-    }
-  },
-  {
-    infinitive: 'poder',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['puedo','puedes','puede','podemos','podéis','pueden'],
-      'pretérito': ['pude','pudiste','pudo','pudimos','pudisteis','pudieron'],
-      'imperfecto': ['podía','podías','podía','podíamos','podíais','podían'],
-      'futuro': ['podré','podrás','podrá','podremos','podréis','podrán']
-    }
-  },
-  {
-    infinitive: 'querer',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['quiero','quieres','quiere','queremos','queréis','quieren'],
-      'pretérito': ['quise','quisiste','quiso','quisimos','quisisteis','quisieron'],
-      'imperfecto': ['quería','querías','quería','queríamos','queríais','querían'],
-      'futuro': ['querré','querrás','querrá','querremos','querréis','querrán']
-    }
-  },
-  {
-    infinitive: 'decir',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['digo','dices','dice','decimos','decís','dicen'],
-      'pretérito': ['dije','dijiste','dijo','dijimos','dijisteis','dijeron'],
-      'imperfecto': ['decía','decías','decía','decíamos','decíais','decían'],
-      'futuro': ['diré','dirás','dirá','diremos','diréis','dirán']
-    }
-  },
-  {
-    infinitive: 'poner',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['pongo','pones','pone','ponemos','ponéis','ponen'],
-      'pretérito': ['puse','pusiste','puso','pusimos','pusisteis','pusieron'],
-      'imperfecto': ['ponía','ponías','ponía','poníamos','poníais','ponían'],
-      'futuro': ['pondré','pondrás','pondrá','pondremos','pondréis','pondrán']
-    }
-  },
-  {
-    infinitive: 'salir',
-    regular: false,
-    packs: ['top10','top50','gcse'],
-    tenses: {
-      'presente': ['salgo','sales','sale','salimos','salís','salen'],
-      'pretérito': ['salí','saliste','salió','salimos','salisteis','salieron'],
-      'imperfecto': ['salía','salías','salía','salíamos','salíais','salían'],
-      'futuro': ['saldré','saldrás','saldrá','saldremos','saldréis','saldrán']
-    }
-  }
+  {infinitive:'estar',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['estoy','estás','está','estamos','estáis','están'],
+      'pretérito':['estuve','estuviste','estuvo','estuvimos','estuvisteis','estuvieron'],
+      'imperfecto':['estaba','estabas','estaba','estábamos','estabais','estaban'],
+      'futuro':['estaré','estarás','estará','estaremos','estaréis','estarán']
+    }},
+  {infinitive:'tener',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['tengo','tienes','tiene','tenemos','tenéis','tienen'],
+      'pretérito':['tuve','tuviste','tuvo','tuvimos','tuvisteis','tuvieron'],
+      'imperfecto':['tenía','tenías','tenía','teníamos','teníais','tenían'],
+      'futuro':['tendré','tendrás','tendrá','tendremos','tendréis','tendrán']
+    }},
+  {infinitive:'hacer',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['hago','haces','hace','hacemos','hacéis','hacen'],
+      'pretérito':['hice','hiciste','hizo','hicimos','hicisteis','hicieron'],
+      'imperfecto':['hacía','hacías','hacía','hacíamos','hacíais','hacían'],
+      'futuro':['haré','harás','hará','haremos','haréis','harán']
+    }},
+  {infinitive:'ir',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['voy','vas','va','vamos','vais','van'],
+      'pretérito':['fui','fuiste','fue','fuimos','fuisteis','fueron'],
+      'imperfecto':['iba','ibas','iba','íbamos','ibais','iban'],
+      'futuro':['iré','irás','irá','iremos','iréis','irán']
+    }},
+  {infinitive:'poder',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['puedo','puedes','puede','podemos','podéis','pueden'],
+      'pretérito':['pude','pudiste','pudo','pudimos','pudisteis','pudieron'],
+      'imperfecto':['podía','podías','podía','podíamos','podíais','podían'],
+      'futuro':['podré','podrás','podrá','podremos','podréis','podrán']
+    }},
+  {infinitive:'querer',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['quiero','quieres','quiere','queremos','queréis','quieren'],
+      'pretérito':['quise','quisiste','quiso','quisimos','quisisteis','quisieron'],
+      'imperfecto':['quería','querías','quería','queríamos','queríais','querían'],
+      'futuro':['querré','querrás','querrá','querremos','querréis','querrán']
+    }},
+  {infinitive:'decir',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['digo','dices','dice','decimos','decís','dicen'],
+      'pretérito':['dije','dijiste','dijo','dijimos','dijisteis','dijeron'],
+      'imperfecto':['decía','decías','decía','decíamos','decíais','decían'],
+      'futuro':['diré','dirás','dirá','diremos','diréis','dirán']
+    }},
+  {infinitive:'poner',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['pongo','pones','pone','ponemos','ponéis','ponen'],
+      'pretérito':['puse','pusiste','puso','pusimos','pusisteis','pusieron'],
+      'imperfecto':['ponía','ponías','ponía','poníamos','poníais','ponían'],
+      'futuro':['pondré','pondrás','pondrá','pondremos','pondréis','pondrán']
+    }},
+  {infinitive:'salir',regular:false,packs:['top10','top50','gcse'],
+    tenses:{
+      'presente':['salgo','sales','sale','salimos','salís','salen'],
+      'pretérito':['salí','saliste','salió','salimos','salisteis','salieron'],
+      'imperfecto':['salía','salías','salía','salíamos','salíais','salían'],
+      'futuro':['saldré','saldrás','saldrá','saldremos','saldréis','saldrán']
+    }},
+
+  // ---------- REGULAR & COMMON ADDITIONS ----------
+  {infinitive:'hablar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['hablo','hablas','habla','hablamos','habláis','hablan'],
+      'pretérito':['hablé','hablaste','habló','hablamos','hablasteis','hablaron'],
+      'imperfecto':['hablaba','hablabas','hablaba','hablábamos','hablabais','hablaban'],
+      'futuro':['hablaré','hablarás','hablará','hablaremos','hablaréis','hablarán']
+    }},
+  {infinitive:'comer',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['como','comes','come','comemos','coméis','comen'],
+      'pretérito':['comí','comiste','comió','comimos','comisteis','comieron'],
+      'imperfecto':['comía','comías','comía','comíamos','comíais','comían'],
+      'futuro':['comeré','comerás','comerá','comeremos','comeréis','comerán']
+    }},
+  {infinitive:'vivir',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['vivo','vives','vive','vivimos','vivís','viven'],
+      'pretérito':['viví','viviste','vivió','vivimos','vivisteis','vivieron'],
+      'imperfecto':['vivía','vivías','vivía','vivíamos','vivíais','vivían'],
+      'futuro':['viviré','vivirás','vivirá','viviremos','viviréis','vivirán']
+    }},
+  {infinitive:'leer',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['leo','lees','lee','leemos','leéis','leen'],
+      'pretérito':['leí','leíste','leyó','leímos','leísteis','leyeron'],
+      'imperfecto':['leía','leías','leía','leíamos','leíais','leían'],
+      'futuro':['leeré','leerás','leerá','leeremos','leeréis','leerán']
+    }},
+  {infinitive:'beber',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['bebo','bebes','bebe','bebemos','bebéis','beben'],
+      'pretérito':['bebí','bebiste','bebió','bebimos','bebisteis','bebieron'],
+      'imperfecto':['bebía','bebías','bebía','bebíamos','bebíais','bebían'],
+      'futuro':['beberé','beberás','beberá','beberemos','beberéis','beberán']
+    }},
+  {infinitive:'abrir',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['abro','abres','abre','abrimos','abrís','abren'],
+      'pretérito':['abrí','abriste','abrió','abrimos','abristeis','abrieron'],
+      'imperfecto':['abría','abrías','abría','abríamos','abríais','abrían'],
+      'futuro':['abriré','abrirás','abrirá','abriremos','abriréis','abrirán']
+    }},
+  {infinitive:'cerrar',regular:false,packs:['top50','gcse'],
+    tenses:{
+      'presente':['cierro','cierras','cierra','cerramos','cerráis','cierran'],
+      'pretérito':['cerré','cerraste','cerró','cerramos','cerrasteis','cerraron'],
+      'imperfecto':['cerraba','cerrabas','cerraba','cerrábamos','cerrabais','cerraban'],
+      'futuro':['cerraré','cerrarás','cerrará','cerraremos','cerraréis','cerrarán']
+    }},
+  {infinitive:'jugar',regular:false,packs:['top50','gcse'],
+    tenses:{
+      'presente':['juego','juegas','juega','jugamos','jugáis','juegan'],
+      'pretérito':['jugué','jugaste','jugó','jugamos','jugasteis','jugaron'],
+      'imperfecto':['jugaba','jugabas','jugaba','jugábamos','jugabais','jugaban'],
+      'futuro':['jugaré','jugarás','jugará','jugaremos','jugaréis','jugarán']
+    }},
+  {infinitive:'trabajar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['trabajo','trabajas','trabaja','trabajamos','trabajáis','trabajan'],
+      'pretérito':['trabajé','trabajaste','trabajó','trabajamos','trabajasteis','trabajaron'],
+      'imperfecto':['trabajaba','trabajabas','trababa','trabajábamos','trabajabais','trabajaban'],
+      'futuro':['trabajaré','trabajarás','trabajará','trabajaremos','trabajaréis','trabajarán']
+    }},
+  {infinitive:'necesitar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['necesito','necesitas','necesita','necesitamos','necesitáis','necesitan'],
+      'pretérito':['necesité','necesitaste','necesitó','necesitamos','necesitasteis','necesitaron'],
+      'imperfecto':['necesitaba','necesitabas','necesitaba','necesitábamos','necesitabais','necesitaban'],
+      'futuro':['necesitaré','necesitarás','necesitará','necesitaremos','necesitaréis','necesitarán']
+    }},
+  {infinitive:'vivir',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['vivo','vives','vive','vivimos','vivís','viven'],
+      'pretérito':['viví','viviste','vivió','vivimos','vivisteis','vivieron'],
+      'imperfecto':['vivía','vivías','vivía','vivíamos','vivíais','vivían'],
+      'futuro':['viviré','vivirás','vivirá','viviremos','viviréis','vivirán']
+    }},
+  {infinitive:'estudiar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['estudio','estudias','estudia','estudiamos','estudiáis','estudian'],
+      'pretérito':['estudié','estudiaste','estudió','estudiamos','estudiasteis','estudiaron'],
+      'imperfecto':['estudiaba','estudiabas','estudiaba','estudiábamos','estudiabais','estudiaban'],
+      'futuro':['estudiaré','estudiarás','estudiará','estudiaremos','estudiaréis','estudiarán']
+    }},
+  {infinitive:'gustar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['gusta','gustan','gusta','gustamos','gustáis','gustan'],
+      'pretérito':['gustó','gustaron','gustó','gustamos','gustasteis','gustaron'],
+      'imperfecto':['gustaba','gustaban','gustaba','gustábamos','gustabais','gustaban'],
+      'futuro':['gustará','gustarán','gustará','gustaremos','gustaréis','gustarán']
+    }},
+  {infinitive:'pagar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['pago','pagas','paga','pagamos','pagáis','pagan'],
+      'pretérito':['pagué','pagaste','pagó','pagamos','pagasteis','pagaron'],
+      'imperfecto':['pagaba','pagabas','pagaba','pagábamos','pagabais','pagaban'],
+      'futuro':['pagaré','pagarás','pagará','pagaremos','pagaréis','pagarán']
+    }},
+  {infinitive:'usar',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['uso','usas','usa','usamos','usáis','usan'],
+      'pretérito':['usé','usaste','usó','usamos','usasteis','usaron'],
+      'imperfecto':['usaba','usabas','usaba','usábamos','usabais','usaban'],
+      'futuro':['usaré','usarás','usará','usaremos','usaréis','usarán']
+    }},
+  {infinitive:'abrir',regular:true,packs:['top50','gcse'],
+    tenses:{
+      'presente':['abro','abres','abre','abrimos','abrís','abren'],
+      'pretérito':['abrí','abriste','abrió','abrimos','abristeis','abrieron'],
+      'imperfecto':['abría','abrías','abría','abríamos','abríais','abrían'],
+      'futuro':['abriré','abrirás','abrirá','abriremos','abriréis','abrirán']
+    }}
 
 ]
