@@ -1,7 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { VERB_BANK, TENSES, SUBJECTS } from '../data/verbs_es'
 
-// pack labels (expand if you add more packs)
 const PACKS = [
   { id: 'top10', label: 'Top 10' },
   { id: 'top50', label: 'Top 50' },
@@ -16,8 +15,9 @@ export default function Practice() {
   const [current, setCurrent] = useState(null)
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [score, setScore] = useState({ correct: 0, attempts: 0 })
 
-  // Filter verbs by current settings
+  // Filter verbs by settings
   const filteredVerbs = useMemo(() => {
     return VERB_BANK.filter(v => {
       if (regularity === 'regular' && !v.regular) return false
@@ -43,10 +43,37 @@ export default function Practice() {
 
   function checkAnswer() {
     if (!current) return
-    const correct = current.correct.trim().toLowerCase()
+    const correctForm = current.correct.trim().toLowerCase()
     const given = answer.trim().toLowerCase()
-    if (given === correct) setFeedback('✅ Correct!')
-    else setFeedback(`❌ Incorrect. Correct: ${correct}`)
+    const isCorrect = given === correctForm
+    setFeedback(isCorrect ? '✅ Correct!' : `❌ Incorrect. Correct: ${correctForm}`)
+    setScore(prev => ({ correct: prev.correct + (isCorrect ? 1 : 0), attempts: prev.attempts + 1 }))
+
+    // Move to next question automatically after 1s
+    setTimeout(() => {
+      newQuestion()
+    }, 1000)
+  }
+
+  // Handle Enter key
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (answer.trim() !== '') {
+          checkAnswer()
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  })
+
+  function resetScore() {
+    setScore({ correct: 0, attempts: 0 })
+    setFeedback('')
+    setAnswer('')
+    newQuestion()
   }
 
   return (
@@ -148,6 +175,12 @@ export default function Practice() {
         >
           Check
         </button>
+        <button
+          onClick={resetScore}
+          className="bg-gray-400 text-white px-4 py-2 rounded"
+        >
+          Reset Score
+        </button>
       </div>
 
       {/* Question */}
@@ -173,7 +206,7 @@ export default function Practice() {
 
           <input
             className="border p-2 rounded w-full"
-            placeholder="Type your answer..."
+            placeholder="Type your answer and press Enter..."
             value={answer}
             onChange={e => setAnswer(e.target.value)}
           />
@@ -181,6 +214,16 @@ export default function Practice() {
           {feedback && <p className="mt-3 font-semibold">{feedback}</p>}
         </div>
       )}
+
+      {/* Score Tracker */}
+      <div className="mt-8 border-t pt-4 text-lg font-semibold">
+        Score: {score.correct} / {score.attempts}{' '}
+        {score.attempts > 0 && (
+          <span className="text-gray-500 text-sm ml-2">
+            ({Math.round((score.correct / score.attempts) * 100)}%)
+          </span>
+        )}
+      </div>
     </div>
   )
 }
