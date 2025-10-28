@@ -1,23 +1,26 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import NavBar from './components/NavBar.jsx'
-import Home from './pages/Home.jsx'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Practice from './pages/Practice.jsx'
 import Verbs from './pages/Verbs.jsx'
-import Settings from './pages/Settings.jsx'
+import Vocab from './pages/Vocab.jsx'
 
-export default function App(){
+export default function App() {
   return (
     <BrowserRouter>
-      <NavBar />
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Simple navigation bar */}
+      <nav className="p-4 flex gap-4 border-b bg-gray-50">
+        <Link to="/" className="text-blue-600 hover:underline">Practice</Link>
+        <Link to="/verbs" className="text-blue-600 hover:underline">Verbs</Link>
+        <Link to="/vocab" className="text-blue-600 hover:underline">Vocab</Link>
+      </nav>
+
+      {/* Main page area */}
+      <main className="p-4">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/practice" element={<Practice />} />
+          <Route path="/" element={<Practice />} />
           <Route path="/verbs" element={<Verbs />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/vocab" element={<Vocab />} />
         </Routes>
-      </div>
+      </main>
     </BrowserRouter>
   )
 }
